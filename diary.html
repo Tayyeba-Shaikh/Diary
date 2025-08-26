@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Diary - For Him</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #ffeef8, #ffe0f0);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .diary-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(233, 30, 99, 0.2);
+            overflow: hidden;
+        }
+
+        .diary-header {
+            background: linear-gradient(135deg, #e91e63, #f06292);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .diary-title {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-family: 'Dancing Script', cursive;
+        }
+
+        .diary-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .page-navigation {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+
+        .page-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: #e91e63;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .page-btn:hover {
+            background: #c2185b;
+            transform: translateY(-2px);
+        }
+
+        .page-btn.active {
+            background: #ad1457;
+            transform: scale(1.1);
+        }
+
+        .page-content {
+            padding: 40px;
+            min-height: 500px;
+            position: relative;
+        }
+
+        .diary-page {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .diary-page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #e91e63;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .live-textarea {
+            width: 100%;
+            min-height: 300px;
+            border: none;
+            background: transparent;
+            font-family: 'Georgia', serif;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #333;
+            resize: vertical;
+            padding: 20px;
+            outline: none;
+            background-image: 
+                linear-gradient(to right, #f0f0f0 1px, transparent 1px),
+                linear-gradient(to bottom, #f0f0f0 1px, transparent 1px);
+            background-size: 25px 25px;
+        }
+
+        .live-textarea:focus {
+            background-color: #fff9fa;
+        }
+
+        .typing-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 20px;
+            background: #e91e63;
+            animation: blink 1s infinite;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .save-btn {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .heart-decoration {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            color: #e91e63;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .date-stamp {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 0.9rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .memory-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .memory-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .memory-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .memory-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .add-memory-btn {
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .wishes-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .wish-item {
+            background: #fff9fa;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #e91e63;
+            transition: all 0.3s ease;
+        }
+
+        .wish-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .wish-text {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .wish-author {
+            font-size: 0.9rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .floating-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .floating-heart {
+            position: absolute;
+            color: #e91e63;
+            font-size: 20px;
+            animation: float-up 4s linear infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes float-up {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            90% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="diary-container">
+        <div class="diary-header">
+            <h1 class="diary-title">My Heart's Diary</h1>
+            <p class="diary-subtitle">A small Gift for You ❤️</p>
+            <div class="heart-decoration">💝</div>
+        </div>
+
+        <div class="page-navigation">
+            <button class="page-btn active" onclick="showPage(0)">Dear Diary</button>
+            <button class="page-btn" onclick="showPage(1)">Letters</button>
+            <button class="page-btn" onclick="showPage(2)">Memories Entry</button>
+            <button class="page-btn" onclick="showPage(3)">Wishes</button>
+            <button class="page-btn" onclick="showPage(4)">Future Dreams</button>
+        </div>
+
+        <div class="page-content">
+            <!-- Page 1: Dear Diary -->
+            <div class="diary-page active" id="page0">
+                <div class="date-stamp" id="date0"></div>
+                <div class="page-header">Dear Diary - My Heart Today</div>
+                <textarea class="live-textarea" id="diaryText0" placeholder="Dear Love,
+Today is your special day, and my heart is overflowing with emotions...
+
+I want to write down every feeling, every memory, every wish I have for you on this beautiful day. This diary is my gift to you - a collection of my heart's whispers, my soul's deepest desires for your happiness.
+
+Start writing your heart out... 💕"></textarea>
+                <button class="save-btn" onclick="savePage(0)">Save This Moment</button>
+            </div>
+
+            <!-- Page 2: Love Letters -->
+            <div class="diary-page" id="page1">
+                <div class="date-stamp" id="date1"></div>
+                <div class="page-header"> Letters to You</div>
+                <textarea class="live-textarea" id="diaryText1" placeholder="My Dearest,
+
+Every beat of my heart writes a new line of love for you. On your birthday, I want to pour out all the words I've been saving...
+
+Write your love letter here... 💌"></textarea>
+                <button class="save-btn" onclick="savePage(1)">Seal with Love</button>
+            </div>
+
+            <!-- Page 3: Memories -->
+            <div class="diary-page" id="page2">
+                <div class="date-stamp" id="date2"></div>
+                <div class="page-header">Our Beautiful Memories</div>
+                <div class="memory-gallery" id="memoryGallery">
+                    <div class="memory-item">
+                        <input type="text" class="memory-input" placeholder="Memory title..." />
+                        <textarea class="memory-input" placeholder="Describe this beautiful memory..."></textarea>
+                        <button class="add-memory-btn" onclick="addMemory()">Add Memory</button>
+                    </div>
+                </div>
+                <textarea class="live-textarea" id="diaryText2" placeholder="Today, I want to relive every beautiful moment we've shared...
+
+The way you smile, the sound of your laughter, the warmth of your hugs - every memory is a treasure I keep close to my heart.
+
+Write your favorite memories here... 🎈"></textarea>
+                <button class="save-btn" onclick="savePage(2)">Save Memories</button>
+            </div>
+
+            <!-- Page 4: Birthday Wishes -->
+            <div class="diary-page" id="page3">
+                <div class="date-stamp" id="date3"></div>
+                <div class="page-header">My Birthday Wishes for You</div>
+                <ul class="wishes-list" id="wishesList">
+                    <li class="wish-item">
+                        <div class="wish-text">May your day be filled with endless joy and love</div>
+                        <div class="wish-author">From my heart to yours</div>
+                    </li>
+                </ul>
+                <textarea class="live-textarea" id="diaryText3" placeholder="My wishes for you on this special day:
+
+🎂 May every candle bring a new dream come true
+🌟 May your path be lit with happiness and success
+💝 May love surround you always
+🎉 May this year be your best one yet
+
+Add your personal wishes here... ✨"></textarea>
+                <button class="save-btn" onclick="addWish()">Add Another Wish</button>
+                <button class="save-btn" onclick="savePage(3)">Save All Wishes</button>
+            </div>
+
+            <!-- Page 5: Future Dreams -->
+            <div class="diary-page" id="page4">
+                <div class="date-stamp" id="date4"></div>
+                <div class="page-header">Dreams for Our Future</div>
+                <textarea class="live-textarea" id="diaryText4" placeholder="As you blow out your candles, I close my eyes and make my own silent wish...
+
+I dream of all the birthdays we'll celebrate together, all the memories we'll create, all the love we'll share.
+
+I see us:
+- Laughing until our sides hurt
+- Supporting each other through every challenge
+- Growing old together, still holding hands
+- Creating a lifetime of beautiful moments
+
+Share your dreams for the future... 🌙"></textarea>
+                <button class="save-btn" onclick="savePage(4)">Save Dreams</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="floating-hearts" id="floatingHearts"></div>
+
+    <script>
+        // Initialize dates
+        function initializeDates() {
+            const today = new Date();
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = today.toLocaleDateString('en-US', dateOptions);
+            
+            for (let i = 0; i < 5; i++) {
+                document.getElementById(`date${i}`).textContent = formattedDate;
+            }
+        }
+
+        // Page navigation
+        function showPage(pageIndex) {
+            const pages = document.querySelectorAll('.diary-page');
+            const buttons = document.querySelectorAll('.page-btn');
+            
+            pages.forEach(page => page.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            pages[pageIndex].classList.add('active');
+            buttons[pageIndex].classList.add('active');
+            
+            // Load saved content
+            loadPage(pageIndex);
+        }
+
+        // Save page content
+        function savePage(pageIndex) {
+            const content = document.getElementById(`diaryText${pageIndex}`).value;
+            localStorage.setItem(`diaryPage${pageIndex}`, content);
+            
+            // Show save animation
+            const btn = event.target;
+            btn.textContent = 'Saved! ❤️';
+            btn.style.background = '#4caf50';
+            setTimeout(() => {
+                btn.textContent = pageIndex === 3 ? 'Save All Wishes' : 'Save This Moment';
+                btn.style.background = pageIndex === 3 ? '#4caf50' : '#4caf50';
+            }, 2000);
+        }
+
+        // Load page content
+        function loadPage(pageIndex) {
+            const savedContent = localStorage.getItem(`diaryPage${pageIndex}`);
+            if (savedContent) {
+                document.getElementById(`diaryText${pageIndex}`).value = savedContent;
+            }
+        }
+
+        // Add memory
+        function addMemory() {
+            const gallery = document.getElementById('memoryGallery');
+            const newMemory = document.createElement('div');
+            newMemory.className = 'memory-item';
+            newMemory.innerHTML = `
+                <input type="text" class="memory-input" placeholder="Memory title..." />
+                <textarea class="memory-input" placeholder="Describe this beautiful memory..."></textarea>
+                <button class="add-memory-btn" onclick="this.parentElement.remove()">Remove</button>
+            `;
+            gallery.appendChild(newMemory);
+        }
+
+        // Add wish
+        function addWish() {
+            const wishesList = document.getElementById('wishesList');
+            const newWish = document.createElement('li');
+            newWish.className = 'wish-item';
+            newWish.innerHTML = `
+                <div class="wish-text" contenteditable="true">Your special wish here...</div>
+                <div class="wish-author">From my heart</div>
+            `;
+            wishesList.appendChild(newWish);
+        }
+
+        // Create floating hearts
+        function createFloatingHearts() {
+            const container = document.getElementById('floatingHearts');
+            
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.className = 'floating-heart';
+                heart.innerHTML = '💖';
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = 4 + Math.random() * 3 + 's';
+                heart.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(heart);
+                
+                setTimeout(() => {
+                    heart.remove();
+                }, 7000);
+            }, 3000);
+        }
+
+        // Live typing effect
+        function addTypingEffect() {
+            const textareas = document.querySelectorAll('.live-textarea');
+            textareas.forEach(textarea => {
+                textarea.addEventListener('input', function() {
+                    this.style.backgroundColor = '#fff9fa';
+                    setTimeout(() => {
+                        this.style.backgroundColor = 'transparent';
+                    }, 500);
+                });
+            });
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDates();
+            createFloatingHearts();
+            addTypingEffect();
+            
+            // Load all saved content
+            for (let i = 0; i < 5; i++) {
+                loadPage(i);
+            }
+        });
+
+        // Auto-save functionality
+        setInterval(() => {
+            for (let i = 0; i < 5; i++) {
+                const content = document.getElementById(`diaryText${i}`).value;
+                if (content !== localStorage.getItem(`diaryPage${i}`)) {
+                    localStorage.setItem(`diaryPage${i}`, content);
+                }
+            }
+        }, 10000); // Auto-save every 10 seconds
+    </script>
+</body>
+</html>
